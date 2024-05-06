@@ -26,7 +26,7 @@ const center = { lat: 16.05435, lng: 108.20848 } // Get lat and lang from realti
 
 function App() {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: 'AIzaSyCrXHAD0DsyKqm-5uP7_Hi4t9yWMhyqe2g', // Config to env
+    googleMapsApiKey: 'AIzaSyDqmGRp_FcaQyKKZI4jF6jTtqbRLOAnM38', // Config to env
     libraries: ['places'],
   })
 
