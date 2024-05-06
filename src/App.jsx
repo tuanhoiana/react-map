@@ -23,7 +23,7 @@ import { useEffect, useRef, useState } from "react";
 import { getHistory, getRealtime } from "./services/api";
 
 // const center = { lat: 15.83226, lng: 108.40632 }; // Default location when start app
-const center = { lat: 16.05435, lng: 108.20848 } // Get lat and lang from realtime API
+const center = { lat: 16.05435, lng: 108.20848 }; // Get lat and lang from realtime API
 
 function App() {
   const { isLoaded } = useJsApiLoader({
@@ -40,7 +40,9 @@ function App() {
   const originRef = useRef();
   /** @type React.MutableRefObject<HTMLInputElement> */
   const destiantionRef = useRef();
-  const [realtime, setRealtime] = useState(null);
+  /** @type React.MutableRefObject<HTMLInputElement> */
+  const waypointsRef = useRef();
+  const [realtime, setRealtime] = useState(null);  
 
   // Prepare bus stops - Fake datas
   const busStops = [
@@ -56,17 +58,21 @@ function App() {
       location:
         "Bệnh Viện Quân Y C17, Nguyễn Hữu Thọ, Hòa Thuận Tây, Hải Châu District, Da Nang, Vietnam",
     },
+    {
+      location:
+        "Bệnh Viện Quân Y C17, Nguyễn Hữu Thọ, Hòa Thuận Tây, Hải Châu District, Da Nang, Vietnam",
+    },
   ];
 
   // Call api history
-  useEffect(() => {
-    const fetchHistories = async () => {
-      const data = await getHistory();
-      setHistories(data);
-    };
+  // useEffect(() => {
+  //   const fetchHistories = async () => {
+  //     const data = await getHistory();
+  //     setHistories(data);
+  //   };
 
-    fetchHistories();
-  }, []);
+  //   fetchHistories();
+  // }, []);
 
   // Call api realtime
   useEffect(() => {
@@ -90,20 +96,25 @@ function App() {
     }
 
     // Selected multiple bus stops
-    const waypt = [];
-    busStops.forEach((busStop) => {
-      waypt.push({
-        location: busStop.location,
-        stopover: true,
-      });
-    });
+    const waypts = [];
+    const checkboxArray = waypointsRef.current;
+
+    for (let i = 0; i < checkboxArray.length; i++) {
+      if (checkboxArray.options[i].selected) {
+        waypts.push({
+          location: checkboxArray[i].value,
+          stopover: true,
+        });
+      }
+    }
 
     // eslint-disable-next-line no-undef
     const directionsService = new google.maps.DirectionsService();
     const results = await directionsService.route({
       origin: currentLocation, // Start point
-      waypoints: busStops,
-      destination: destiantionRef.current.value, // End point
+      waypoints: waypts,
+      destination: center, // End point
+      optimizeWaypoints: true,
       // eslint-disable-next-line no-undef
       travelMode: google.maps.TravelMode.DRIVING,
     });
@@ -180,11 +191,11 @@ function App() {
           </Box>
           <Box flexGrow={1}>
             <Autocomplete>
-              <Input
+              {/* <Input
                 type="text"
                 placeholder="Destination - Bus stop"
                 ref={destiantionRef}
-              />
+              /> */}
               {/* <Select placeholder="Distination - Bus stop">
                 {busStops.map((busStop, index) => (
                 <option key={index} value={busStop.location}>
@@ -192,6 +203,14 @@ function App() {
                   </option>
                 ))} 
                </Select> */}
+
+              <Select isFullWidth={true} multiple ref={waypointsRef}>
+                {busStops.map((busStop, index) => (
+                  <option key={index} value={busStop.location}>
+                    {busStop.location}
+                  </option>
+                ))}
+              </Select>
             </Autocomplete>
           </Box>
 
@@ -219,7 +238,6 @@ function App() {
             isRound
             onClick={() => {
               map.panTo(currentLocation);
-              // map.p
               map.setZoom(16);
             }}
           />
