@@ -1,133 +1,132 @@
 {
-    "timestamp": 0,
-    "status": 200,
-    "datetime": "2024-04-22 10:18:06",
-    "message": "Get status device successfully.",
-    "messageCode": "CLIENT__GET_STATUS_DEVICE_SUCCESS",
-    "result": [
-      {
-        "favorite": 0,
-        "type": 37,
-        "status": "run",
-        "statusDuration": 0,
-        "sensors": [],
-        "groups": null,
-        "groupName": "",
-        "groupId": 0,
-        "activeDate": "2021-12-29 13:09:26",
-        "name": "43B04838",
-        "lat": 16.0114316666667,
-        "lng": 108.086333333333,
-        "powerVoltage": 27.24,
-        "battery": {
-          "isAvailable": false,
-          "voltage": 0,
-          "percent": 0,
-          "level": 0,
-          "isCharged": true
+  "timestamp": 0,
+  "status": 200,
+  "datetime": "2024-04-22 10:18:06",
+  "message": "Get status device successfully.",
+  "messageCode": "CLIENT__GET_STATUS_DEVICE_SUCCESS",
+  "result": [
+    {
+      "favorite": 0,
+      "type": 37,
+      "status": "run",
+      "statusDuration": 0,
+      "sensors": [],
+      "groups": null,
+      "groupName": "",
+      "groupId": 0,
+      "activeDate": "2021-12-29 13:09:26",
+      "name": "43B04838",
+      "lat": 15.84021,
+      "lng": 108.39215,
+      "powerVoltage": 27.24,
+      "battery": {
+        "isAvailable": false,
+        "voltage": 0,
+        "percent": 0,
+        "level": 0,
+        "isCharged": true
+      },
+      "dayDistance": 0,
+      "drivingTime": 0,
+      "dayDrivingTime": 0,
+      "direction": 83,
+      "icon": {
+        "name": "car"
+      },
+      "geofenceObj": {
+        "id": 0,
+        "name": null
+      },
+      "geofence": "",
+      "timestampUTC": 1713780149,
+      "updatetimeUTC": 1713780154,
+      "address": "",
+      "speed": 50,
+      "id": 79458,
+      "imei": "862205051164533",
+      "numberPlate": "43B04838",
+      "frameNumber": "",
+      "odometer": 0,
+      "odoEngine": 0,
+      "driver": null,
+      "expiredAt": "2024-12-31 00:00:00",
+      "gsm": {
+        "level": 58,
+        "signal": 18
+      },
+      "gps": 14,
+      "simno": "1210566741",
+      "basic": [
+        {
+          "value": 1,
+          "startTime": 1713779499,
+          "type": "ignition"
         },
-        "dayDistance": 0,
-        "drivingTime": 0,
-        "dayDrivingTime": 0,
-        "direction": 83,
-        "icon": {
-          "name": "car"
+        {
+          "value": 0,
+          "startTime": 1700655435,
+          "type": "door"
         },
-        "geofenceObj": {
-          "id": 0,
-          "name": null
+        {
+          "value": 0,
+          "startTime": 1700655435,
+          "type": "air"
         },
-        "geofence": "",
-        "timestampUTC": 1713780149,
-        "updatetimeUTC": 1713780154,
-        "address": "",
-        "speed": 50,
-        "id": 79458,
-        "imei": "862205051164533",
-        "numberPlate": "43B04838",
-        "frameNumber": "",
-        "odometer": 0,
-        "odoEngine": 0,
-        "driver": null,
-        "expiredAt": "2024-12-31 00:00:00",
-        "gsm": {
-          "level": 58,
-          "signal": 18
+        {
+          "value": 1,
+          "startTime": 1713779499,
+          "type": "engine"
         },
-        "gps": 14,
-        "simno": "1210566741",
-        "basic": [
-          {
-            "value": 1,
-            "startTime": 1713779499,
-            "type": "ignition"
-          },
-          {
-            "value": 0,
-            "startTime": 1700655435,
-            "type": "door"
-          },
-          {
-            "value": 0,
-            "startTime": 1700655435,
-            "type": "air"
-          },
-          {
-            "value": 1,
-            "startTime": 1713779499,
-            "type": "engine"
-          },
-          {
-            "value": -1,
-            "startTime": 0,
-            "type": "seatBelt"
-          },
-          {
-            "value": -1,
-            "startTime": 0,
-            "type": "attach"
-          }
-        ],
-        "govManagement": "Đà Nẵng",
-        "updatetimeGPS": 1713780149,
-        "defence": -1,
-        "fuelToday": 0,
-        "stopEngineTS": 0,
-        "photos": [],
-        "photoIds": [1784],
-        "timeLive": 15109244,
-        "driverInfo": {
-          "hasDriver": true,
-          "rfid": "D356D0A4500104E0",
-          "name": "D356D0A4500104E0",
-          "license": "",
-          "drivingTime": 1020,
-          "drivingOver4hNo": 0,
-          "todayDrivingTime": 13500,
-          "updateTime": 1713780116,
-          "driverId": 3500,
-          "phone": ""
+        {
+          "value": -1,
+          "startTime": 0,
+          "type": "seatBelt"
         },
-        "fwVersion": "IAP.1.00.2011-2.000.00.000003.230512",
-        "userId": 46154,
-        "hwVersion": null,
-        "fwModule": null,
-        "ccid": null,
-        "simStatus": 1,
-        "installSignal": {
-          "air": false,
-          "engine": true,
-          "door": false,
-          "ignition": true,
-          "battery": false,
-          "rfid": false,
-          "externalPower": false,
-          "todayDistance": true
-        },
-        "reserveId": 0,
-        "pinCode": "",
-        "VIN": ""
-      }
-    ]
-  }
-  
+        {
+          "value": -1,
+          "startTime": 0,
+          "type": "attach"
+        }
+      ],
+      "govManagement": "Đà Nẵng",
+      "updatetimeGPS": 1713780149,
+      "defence": -1,
+      "fuelToday": 0,
+      "stopEngineTS": 0,
+      "photos": [],
+      "photoIds": [1784],
+      "timeLive": 15109244,
+      "driverInfo": {
+        "hasDriver": true,
+        "rfid": "D356D0A4500104E0",
+        "name": "D356D0A4500104E0",
+        "license": "",
+        "drivingTime": 1020,
+        "drivingOver4hNo": 0,
+        "todayDrivingTime": 13500,
+        "updateTime": 1713780116,
+        "driverId": 3500,
+        "phone": ""
+      },
+      "fwVersion": "IAP.1.00.2011-2.000.00.000003.230512",
+      "userId": 46154,
+      "hwVersion": null,
+      "fwModule": null,
+      "ccid": null,
+      "simStatus": 1,
+      "installSignal": {
+        "air": false,
+        "engine": true,
+        "door": false,
+        "ignition": true,
+        "battery": false,
+        "rfid": false,
+        "externalPower": false,
+        "todayDistance": true
+      },
+      "reserveId": 0,
+      "pinCode": "",
+      "VIN": ""
+    }
+  ]
+}

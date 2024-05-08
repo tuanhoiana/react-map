@@ -21,13 +21,13 @@ import {
 } from "@react-google-maps/api";
 import { useEffect, useRef, useState } from "react";
 import { getHistory, getRealtime } from "./services/api";
+import data from "./realtime.json";
 
-// const center = { lat: 15.83226, lng: 108.40632 }; // Default location when start app
-const center = { lat: 16.05435, lng: 108.20848 } // Get lat and lang from realtime API
+const center = { lat: 15.84021, lng: 108.39215 };
 
 function App() {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyDqmGRp_FcaQyKKZI4jF6jTtqbRLOAnM38", // Config to env
+    googleMapsApiKey: "AIzaSyDSbDPP4tB6eUrumQSMQN4gjGh75aiANSk", // Config to env
     libraries: ["places"],
   });
 
@@ -40,7 +40,10 @@ function App() {
   const originRef = useRef();
   /** @type React.MutableRefObject<HTMLInputElement> */
   const destiantionRef = useRef();
-  const [realtime, setRealtime] = useState(null);
+  /** @type React.MutableRefObject<HTMLInputElement> */
+  const waypointsRef = useRef();
+  // const [realtime, setRealtime] = useState(null);
+  const [histories, setHistories] = useState([]);
 
   // Prepare bus stops - Fake datas
   const busStops = [
@@ -58,6 +61,17 @@ function App() {
     },
   ];
 
+  // Get current location from api realtime - useEffect
+  const currentLocation = data.result.map((item) => ({
+    lat: item.lat,
+    lng: item.lng,
+  }));
+
+  // Fake end point - Da Nang
+  const end = { lat: 16.05448, lng: 108.20836 };
+
+  console.log("currentLocation", currentLocation[0]);
+
   // Call api history
   useEffect(() => {
     const fetchHistories = async () => {
@@ -69,15 +83,15 @@ function App() {
   }, []);
 
   // Call api realtime
-  useEffect(() => {
-    // TODO: try catch error
-    const fetchRealtime = async () => {
-      const data = await getRealtime();
-      setRealtime(data);
-    };
+  // useEffect(() => {
+  //   // TODO: try catch error
+  //   const fetchRealtime = async () => {
+  //     const data = await getRealtime();
+  //     setRealtime(data);
+  //   };
 
-    fetchRealtime();
-  }, []);
+  //   fetchRealtime();
+  // }, []);
 
   if (!isLoaded) {
     return <SkeletonText />;
@@ -90,24 +104,30 @@ function App() {
     }
 
     // Selected multiple bus stops
-    const waypt = [];
-    busStops.forEach((busStop) => {
-      waypt.push({
-        location: busStop.location,
-        stopover: true,
-      });
-    });
+    const waypts = [];
+    const checkboxArray = waypointsRef.current;
+
+    for (let i = 0; i < checkboxArray.length; i++) {
+      if (checkboxArray.options[i].selected) {
+        waypts.push({
+          location: checkboxArray[i].value,
+          stopover: true,
+        });
+      }
+    }
 
     // eslint-disable-next-line no-undef
     const directionsService = new google.maps.DirectionsService();
     const results = await directionsService.route({
-      origin: currentLocation, // Start point
-      waypoints: busStops,
-      destination: destiantionRef.current.value, // End point
+      origin: currentLocation[0], // Start point
+      waypoints: waypts,
+      destination: end, // End point
+      optimizeWaypoints: true,
       // eslint-disable-next-line no-undef
       travelMode: google.maps.TravelMode.DRIVING,
     });
     console.log("myResult", results);
+
     setDirectionsResponse(results);
     setDistance(results.routes[0].legs[0].distance.text);
     setDuration(results.routes[0].legs[0].duration?.text);
@@ -121,10 +141,9 @@ function App() {
     destiantionRef.current.value = "";
   };
 
-  const currentLocation = {
-    lat: realtime.result[0].lat,
-    lng: realtime.result[0].lng,
-  };
+  console.log("histories", histories);
+
+  console.log("directionsResponse",directionsResponse)
 
   return (
     <Flex
@@ -148,7 +167,12 @@ function App() {
           }}
           onLoad={(map) => setMap(map)}
         >
-          <Marker position={center} />
+          {/* <Marker
+            position={end}
+            icon={{
+              url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+            }}
+          /> */}
           {directionsResponse && (
             <DirectionsRenderer directions={directionsResponse} />
           )}
@@ -180,18 +204,13 @@ function App() {
           </Box>
           <Box flexGrow={1}>
             <Autocomplete>
-              <Input
-                type="text"
-                placeholder="Destination - Bus stop"
-                ref={destiantionRef}
-              />
-              {/* <Select placeholder="Distination - Bus stop">
+              <select isFullWidth={true} multiple ref={waypointsRef}>
                 {busStops.map((busStop, index) => (
-                <option key={index} value={busStop.location}>
+                  <option key={index} value={busStop.location}>
                     {busStop.location}
                   </option>
-                ))} 
-               </Select> */}
+                ))}
+              </select>
             </Autocomplete>
           </Box>
 
@@ -213,13 +232,12 @@ function App() {
         <HStack spacing={4} mt={4} justifyContent="space-between">
           <Text>Distance: {distance} </Text>
           <Text>Duration: {duration} </Text>
-          <IconButton // Marker current location
+          <IconButton
             aria-label="center back"
             icon={<FaLocationArrow />}
             isRound
             onClick={() => {
-              map.panTo(currentLocation);
-              // map.p
+              map.panTo(currentLocation[0]);
               map.setZoom(16);
             }}
           />
