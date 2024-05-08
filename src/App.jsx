@@ -21,13 +21,13 @@ import {
 } from "@react-google-maps/api";
 import { useEffect, useRef, useState } from "react";
 import { getHistory, getRealtime } from "./services/api";
+import data from "./realtime.json";
 
-// const center = { lat: 15.83226, lng: 108.40632 }; // Default location when start app
-const center = { lat: 16.05435, lng: 108.20848 }; // Get lat and lang from realtime API
+const center = { lat: 106.05448, lng: 108.20836 };
 
 function App() {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyDqmGRp_FcaQyKKZI4jF6jTtqbRLOAnM38", // Config to env
+    googleMapsApiKey: "AIzaSyBX_4XbvldFFu4KjbZp366SiXwCT23xCQM", // Config to env
     libraries: ["places"],
   });
 
@@ -42,7 +42,8 @@ function App() {
   const destiantionRef = useRef();
   /** @type React.MutableRefObject<HTMLInputElement> */
   const waypointsRef = useRef();
-  const [realtime, setRealtime] = useState(null);  
+  // const [realtime, setRealtime] = useState(null);
+  const [histories, setHistories] = useState([]);
 
   // Prepare bus stops - Fake datas
   const busStops = [
@@ -58,32 +59,34 @@ function App() {
       location:
         "Bệnh Viện Quân Y C17, Nguyễn Hữu Thọ, Hòa Thuận Tây, Hải Châu District, Da Nang, Vietnam",
     },
-    {
-      location:
-        "Bệnh Viện Quân Y C17, Nguyễn Hữu Thọ, Hòa Thuận Tây, Hải Châu District, Da Nang, Vietnam",
-    },
   ];
 
+  // Get current location from api realtime - useEffect
+  const currentLocation = data.result.map((item) => ({
+    lat: item.lat,
+    lng: item.lng,
+  }));
+
   // Call api history
-  // useEffect(() => {
-  //   const fetchHistories = async () => {
-  //     const data = await getHistory();
-  //     setHistories(data);
-  //   };
-
-  //   fetchHistories();
-  // }, []);
-
-  // Call api realtime
   useEffect(() => {
-    // TODO: try catch error
-    const fetchRealtime = async () => {
-      const data = await getRealtime();
-      setRealtime(data);
+    const fetchHistories = async () => {
+      const data = await getHistory();
+      setHistories(data);
     };
 
-    fetchRealtime();
+    fetchHistories();
   }, []);
+
+  // Call api realtime
+  // useEffect(() => {
+  //   // TODO: try catch error
+  //   const fetchRealtime = async () => {
+  //     const data = await getRealtime();
+  //     setRealtime(data);
+  //   };
+
+  //   fetchRealtime();
+  // }, []);
 
   if (!isLoaded) {
     return <SkeletonText />;
@@ -111,7 +114,7 @@ function App() {
     // eslint-disable-next-line no-undef
     const directionsService = new google.maps.DirectionsService();
     const results = await directionsService.route({
-      origin: currentLocation, // Start point
+      origin: currentLocation[0], // Start point
       waypoints: waypts,
       destination: center, // End point
       optimizeWaypoints: true,
@@ -119,6 +122,7 @@ function App() {
       travelMode: google.maps.TravelMode.DRIVING,
     });
     console.log("myResult", results);
+
     setDirectionsResponse(results);
     setDistance(results.routes[0].legs[0].distance.text);
     setDuration(results.routes[0].legs[0].duration?.text);
@@ -132,10 +136,7 @@ function App() {
     destiantionRef.current.value = "";
   };
 
-  const currentLocation = {
-    lat: realtime.result[0].lat,
-    lng: realtime.result[0].lng,
-  };
+  console.log("histories", histories);
 
   return (
     <Flex
@@ -191,26 +192,13 @@ function App() {
           </Box>
           <Box flexGrow={1}>
             <Autocomplete>
-              {/* <Input
-                type="text"
-                placeholder="Destination - Bus stop"
-                ref={destiantionRef}
-              /> */}
-              {/* <Select placeholder="Distination - Bus stop">
-                {busStops.map((busStop, index) => (
-                <option key={index} value={busStop.location}>
-                    {busStop.location}
-                  </option>
-                ))} 
-               </Select> */}
-
-              <Select isFullWidth={true} multiple ref={waypointsRef}>
+              <select isFullWidth={true} multiple ref={waypointsRef}>
                 {busStops.map((busStop, index) => (
                   <option key={index} value={busStop.location}>
                     {busStop.location}
                   </option>
                 ))}
-              </Select>
+              </select>
             </Autocomplete>
           </Box>
 
@@ -232,12 +220,12 @@ function App() {
         <HStack spacing={4} mt={4} justifyContent="space-between">
           <Text>Distance: {distance} </Text>
           <Text>Duration: {duration} </Text>
-          <IconButton // Marker current location
+          <IconButton 
             aria-label="center back"
             icon={<FaLocationArrow />}
             isRound
             onClick={() => {
-              map.panTo(currentLocation);
+              map.panTo(currentLocation[0]);
               map.setZoom(16);
             }}
           />
