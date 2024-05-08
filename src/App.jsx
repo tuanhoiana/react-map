@@ -23,7 +23,7 @@ import { useEffect, useRef, useState } from "react";
 import { getHistory, getRealtime } from "./services/api";
 import data from "./realtime.json";
 
-const center = { lat: 106.05448, lng: 108.20836 };
+const center = { lat: 15.84021, lng: 108.39215 };
 
 function App() {
   const { isLoaded } = useJsApiLoader({
@@ -66,6 +66,11 @@ function App() {
     lat: item.lat,
     lng: item.lng,
   }));
+
+  // Fake end point - Da Nang
+  const end = { lat: 16.05448, lng: 108.20836 };
+
+  console.log("currentLocation", currentLocation[0]);
 
   // Call api history
   useEffect(() => {
@@ -116,7 +121,7 @@ function App() {
     const results = await directionsService.route({
       origin: currentLocation[0], // Start point
       waypoints: waypts,
-      destination: center, // End point
+      destination: end, // End point
       optimizeWaypoints: true,
       // eslint-disable-next-line no-undef
       travelMode: google.maps.TravelMode.DRIVING,
@@ -137,6 +142,8 @@ function App() {
   };
 
   console.log("histories", histories);
+
+  console.log("directionsResponse",directionsResponse)
 
   return (
     <Flex
@@ -160,7 +167,12 @@ function App() {
           }}
           onLoad={(map) => setMap(map)}
         >
-          <Marker position={center} />
+          {/* <Marker
+            position={end}
+            icon={{
+              url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+            }}
+          /> */}
           {directionsResponse && (
             <DirectionsRenderer directions={directionsResponse} />
           )}
@@ -220,7 +232,7 @@ function App() {
         <HStack spacing={4} mt={4} justifyContent="space-between">
           <Text>Distance: {distance} </Text>
           <Text>Duration: {duration} </Text>
-          <IconButton 
+          <IconButton
             aria-label="center back"
             icon={<FaLocationArrow />}
             isRound
