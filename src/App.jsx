@@ -8,7 +8,9 @@ import {
   Input,
   Select,
   SkeletonText,
+  Stack,
   Text,
+  layout,
 } from "@chakra-ui/react";
 import { FaLocationArrow, FaTimes } from "react-icons/fa";
 
@@ -32,6 +34,8 @@ function App() {
   });
 
   const [map, setMap] = useState(/** @type google.maps.Map */ (null));
+  const [normalDirectionsResponse, setNormalDirectionsResponse] =
+    useState(null);
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
@@ -44,6 +48,8 @@ function App() {
   const waypointsRef = useRef();
   // const [realtime, setRealtime] = useState(null);
   const [histories, setHistories] = useState([]);
+
+  const startPoint = {lat: 15.8321,lng: 108.40635,}; // Hoiana
 
   // Prepare bus stops - Fake datas
   const busStops = [
@@ -67,10 +73,8 @@ function App() {
     lng: item.lng,
   }));
 
-  // Fake end point - Da Nang
-  const end = { lat: 16.05448, lng: 108.20836 };
-
-  console.log("currentLocation", currentLocation[0]);
+  // Fake end point - Benh vien C17
+  const endPoint = { lat: 16.05448, lng: 108.20836 };
 
   // Call api history
   useEffect(() => {
@@ -104,30 +108,39 @@ function App() {
     }
 
     // Selected multiple bus stops
-    const waypts = [];
-    const checkboxArray = waypointsRef.current;
+    // const waypts = [];
+    // const checkboxArray = waypointsRef.current;
 
-    for (let i = 0; i < checkboxArray.length; i++) {
-      if (checkboxArray.options[i].selected) {
-        waypts.push({
-          location: checkboxArray[i].value,
-          stopover: true,
-        });
-      }
-    }
+    // for (let i = 0; i < checkboxArray.length; i++) {
+    //   if (checkboxArray.options[i].selected) {
+    //     waypts.push({
+    //       location: checkboxArray[i].value,
+    //       stopover: true,
+    //     });
+    //   }
+    // }
 
     // eslint-disable-next-line no-undef
     const directionsService = new google.maps.DirectionsService();
-    const results = await directionsService.route({
-      origin: currentLocation[0], // Start point
-      waypoints: waypts,
-      destination: end, // End point
+    const normalResults = await directionsService.route({
+      origin: startPoint, // Start point
+      waypoints: busStops,
+      destination: endPoint, // End point
       optimizeWaypoints: true,
       // eslint-disable-next-line no-undef
       travelMode: google.maps.TravelMode.DRIVING,
     });
-    console.log("myResult", results);
 
+    const results = await directionsService.route({
+      origin: currentLocation[0], // Start point - realtime
+      waypoints: busStops,
+      destination: endPoint, // End point
+      // optimizeWaypoints: true,
+      // eslint-disable-next-line no-undef
+      travelMode: google.maps.TravelMode.DRIVING,
+    });
+
+    setNormalDirectionsResponse(normalResults);
     setDirectionsResponse(results);
     setDistance(results.routes[0].legs[0].distance.text);
     setDuration(results.routes[0].legs[0].duration?.text);
@@ -140,10 +153,6 @@ function App() {
     originRef.current.value = "";
     destiantionRef.current.value = "";
   };
-
-  console.log("histories", histories);
-
-  console.log("directionsResponse",directionsResponse)
 
   return (
     <Flex
@@ -167,15 +176,36 @@ function App() {
           }}
           onLoad={(map) => setMap(map)}
         >
-          {/* <Marker
-            position={end}
-            icon={{
-              url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-            }}
-          /> */}
-          {directionsResponse && (
+           {directionsResponse && (
             <DirectionsRenderer directions={directionsResponse} />
           )}
+          {normalDirectionsResponse && ( // Draw path from start to end
+            <DirectionsRenderer directions={normalDirectionsResponse} />
+          )}
+         
+
+          {/* Add a Marker for the start point */}
+          {normalDirectionsResponse && (
+            <Marker
+              position={
+                startPoint
+              }
+              icon={{
+                url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+              }}
+            />
+           )}
+
+          {/* Add a Marker for the end point */}
+           {directionsResponse && ( 
+            <Marker
+              position={endPoint}
+              icon={{
+                url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+              }}
+            />
+           )} 
+
         </GoogleMap>
       </Box>
       <Box
@@ -204,13 +234,19 @@ function App() {
           </Box>
           <Box flexGrow={1}>
             <Autocomplete>
-              <select isFullWidth={true} multiple ref={waypointsRef}>
-                {busStops.map((busStop, index) => (
-                  <option key={index} value={busStop.location}>
-                    {busStop.location}
-                  </option>
-                ))}
-              </select>
+              <Stack>
+                <Select
+                  size="lg"
+                  ref={waypointsRef}
+                  placeholder="Select bus stop"
+                >
+                  {busStops.map((busStop, index) => (
+                    <option key={index} value={busStop.location}>
+                      {busStop.location}
+                    </option>
+                  ))}
+                </Select>
+              </Stack>
             </Autocomplete>
           </Box>
 
@@ -238,7 +274,7 @@ function App() {
             isRound
             onClick={() => {
               map.panTo(currentLocation[0]);
-              map.setZoom(16);
+              map.setZoom(20);
             }}
           />
         </HStack>
