@@ -29,13 +29,14 @@ const center = { lat: 15.84021, lng: 108.39215 };
 
 function App() {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyDSbDPP4tB6eUrumQSMQN4gjGh75aiANSk", // Config to env
+    googleMapsApiKey: "AIzaSyBLOMsGChJxggEWtnbpMxxuYc4p8d7FxtY", // Config to env
     libraries: ["places"],
   });
 
   const [map, setMap] = useState(/** @type google.maps.Map */ (null));
   const [normalDirectionsResponse, setNormalDirectionsResponse] =
     useState(null);
+  const [realtimePoints, setRealtimePoints] = useState([]);
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
@@ -60,10 +61,6 @@ function App() {
     {
       location:
         "Trường Đại học Kiến trúc Đà Nẵng, Núi Thành, Hòa Cường, Hòa Cường Nam, Hải Châu District, Da Nang, Vietnam",
-    },
-    {
-      location:
-        "Bệnh Viện Quân Y C17, Nguyễn Hữu Thọ, Hòa Thuận Tây, Hải Châu District, Da Nang, Vietnam",
     },
   ];
 
@@ -131,19 +128,19 @@ function App() {
       travelMode: google.maps.TravelMode.DRIVING,
     });
 
-    const results = await directionsService.route({
-      origin: currentLocation[0], // Start point - realtime
-      waypoints: busStops,
-      destination: endPoint, // End point
-      // optimizeWaypoints: true,
-      // eslint-disable-next-line no-undef
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
+    // const results = await directionsService.route({
+    //   origin: currentLocation[0], // Start point - realtime
+    //   waypoints: busStops,
+    //   destination: endPoint, // End point
+    //   // optimizeWaypoints: true,
+    //   // eslint-disable-next-line no-undef
+    //   travelMode: google.maps.TravelMode.DRIVING,
+    // });
 
     setNormalDirectionsResponse(normalResults);
-    setDirectionsResponse(results);
-    setDistance(results.routes[0].legs[0].distance.text);
-    setDuration(results.routes[0].legs[0].duration?.text);
+    // setDirectionsResponse(results);
+    setDistance(normalResults.routes[0].legs[0].distance.text);
+    setDuration(normalResults.routes[0].legs[0].duration?.text);
   };
 
   const handleClearRoute = () => {
@@ -176,36 +173,15 @@ function App() {
           }}
           onLoad={(map) => setMap(map)}
         >
-           {directionsResponse && (
+           {/* {directionsResponse && (
             <DirectionsRenderer directions={directionsResponse} />
-          )}
+          )} */}
+
+          
           {normalDirectionsResponse && ( // Draw path from start to end
             <DirectionsRenderer directions={normalDirectionsResponse} />
           )}
          
-
-          {/* Add a Marker for the start point */}
-          {normalDirectionsResponse && (
-            <Marker
-              position={
-                startPoint
-              }
-              icon={{
-                url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
-              }}
-            />
-           )}
-
-          {/* Add a Marker for the end point */}
-           {directionsResponse && ( 
-            <Marker
-              position={endPoint}
-              icon={{
-                url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-              }}
-            />
-           )} 
-
         </GoogleMap>
       </Box>
       <Box
