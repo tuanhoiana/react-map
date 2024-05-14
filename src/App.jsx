@@ -36,7 +36,6 @@ function App() {
   const [map, setMap] = useState(/** @type google.maps.Map */ (null));
   const [normalDirectionsResponse, setNormalDirectionsResponse] =
     useState(null);
-  const [realtimePoints, setRealtimePoints] = useState([]);
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
@@ -104,19 +103,6 @@ function App() {
       return;
     }
 
-    // Selected multiple bus stops
-    // const waypts = [];
-    // const checkboxArray = waypointsRef.current;
-
-    // for (let i = 0; i < checkboxArray.length; i++) {
-    //   if (checkboxArray.options[i].selected) {
-    //     waypts.push({
-    //       location: checkboxArray[i].value,
-    //       stopover: true,
-    //     });
-    //   }
-    // }
-
     // eslint-disable-next-line no-undef
     const directionsService = new google.maps.DirectionsService();
     const normalResults = await directionsService.route({
@@ -128,27 +114,28 @@ function App() {
       travelMode: google.maps.TravelMode.DRIVING,
     });
 
-    // const results = await directionsService.route({
-    //   origin: currentLocation[0], // Start point - realtime
-    //   waypoints: busStops,
-    //   destination: endPoint, // End point
-    //   // optimizeWaypoints: true,
-    //   // eslint-disable-next-line no-undef
-    //   travelMode: google.maps.TravelMode.DRIVING,
-    // });
+    const results = await directionsService.route({
+      origin: currentLocation[0], // Start point - realtime
+      waypoints: busStops,
+      destination: endPoint, // End point
+      // optimizeWaypoints: true,
+      // eslint-disable-next-line no-undef
+      travelMode: google.maps.TravelMode.DRIVING,
+    });
 
     setNormalDirectionsResponse(normalResults);
-    // setDirectionsResponse(results);
+    setDirectionsResponse(results);
     setDistance(normalResults.routes[0].legs[0].distance.text);
     setDuration(normalResults.routes[0].legs[0].duration?.text);
   };
 
   const handleClearRoute = () => {
     setDirectionsResponse(null);
+    setNormalDirectionsResponse(null);
     setDistance("");
     setDuration("");
-    originRef.current.value = "";
-    destiantionRef.current.value = "";
+    // originRef.current.value = "";
+    // destiantionRef.current.value = "";
   };
 
   return (
@@ -173,11 +160,9 @@ function App() {
           }}
           onLoad={(map) => setMap(map)}
         >
-           {/* {directionsResponse && (
+           {directionsResponse && (
             <DirectionsRenderer directions={directionsResponse} />
-          )} */}
-
-          
+          )}      
           {normalDirectionsResponse && ( // Draw path from start to end
             <DirectionsRenderer directions={normalDirectionsResponse} />
           )}
@@ -225,7 +210,6 @@ function App() {
               </Stack>
             </Autocomplete>
           </Box>
-
           <ButtonGroup>
             <Button
               colorScheme="blue"
