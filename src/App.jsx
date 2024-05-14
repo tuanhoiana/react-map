@@ -49,7 +49,7 @@ function App() {
   // const [realtime, setRealtime] = useState(null);
   const [histories, setHistories] = useState([]);
 
-  const startPoint = {lat: 15.8321,lng: 108.40635,}; // Hoiana
+  const startPoint = { lat: 15.8321, lng: 108.40635 }; // Hoiana
 
   // Prepare bus stops - Fake datas
   const busStops = [
@@ -123,6 +123,8 @@ function App() {
       travelMode: google.maps.TravelMode.DRIVING,
     });
 
+    console.log("myResult", results)
+
     setNormalDirectionsResponse(normalResults);
     setDirectionsResponse(results);
     setDistance(normalResults.routes[0].legs[0].distance.text);
@@ -134,8 +136,8 @@ function App() {
     setNormalDirectionsResponse(null);
     setDistance("");
     setDuration("");
-    // originRef.current.value = "";
-    // destiantionRef.current.value = "";
+    originRef.current.value = "";
+    destiantionRef.current.value = "";
   };
 
   return (
@@ -160,13 +162,22 @@ function App() {
           }}
           onLoad={(map) => setMap(map)}
         >
-           {directionsResponse && (
+          {directionsResponse && (
             <DirectionsRenderer directions={directionsResponse} />
-          )}      
+          )}
           {normalDirectionsResponse && ( // Draw path from start to end
             <DirectionsRenderer directions={normalDirectionsResponse} />
           )}
-         
+
+          {/* Add a Marker for the start point */}
+          {normalDirectionsResponse && (
+            <Marker
+              position={currentLocation[0]}
+              icon={{
+                url: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
+              }}
+            />
+          )}
         </GoogleMap>
       </Box>
       <Box
