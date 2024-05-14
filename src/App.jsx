@@ -29,7 +29,7 @@ const center = { lat: 15.84021, lng: 108.39215 };
 
 function App() {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyBLOMsGChJxggEWtnbpMxxuYc4p8d7FxtY", // Config to env
+    googleMapsApiKey: "AIzaSyDfsQIIV_h8ddv-RITKVwmavBb8Yj_W_0Y", // Config to env
     libraries: ["places"],
   });
 
@@ -37,6 +37,7 @@ function App() {
   const [normalDirectionsResponse, setNormalDirectionsResponse] =
     useState(null);
   const [directionsResponse, setDirectionsResponse] = useState(null);
+
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
 
@@ -53,6 +54,10 @@ function App() {
 
   // Prepare bus stops - Fake datas
   const busStops = [
+    // {
+    //   lat: 16.02363,
+    //   lng: 108.25061,
+    // },
     {
       location:
         "Bệnh Viện Phụ Sản - Nhi Đà Nẵng, Đường Lê Văn Hiến, Khuê Mỹ, Ngũ Hành Sơn, Da Nang, Vietnam",
@@ -81,17 +86,6 @@ function App() {
 
     fetchHistories();
   }, []);
-
-  // Call api realtime
-  // useEffect(() => {
-  //   // TODO: try catch error
-  //   const fetchRealtime = async () => {
-  //     const data = await getRealtime();
-  //     setRealtime(data);
-  //   };
-
-  //   fetchRealtime();
-  // }, []);
 
   if (!isLoaded) {
     return <SkeletonText />;
@@ -123,7 +117,37 @@ function App() {
       travelMode: google.maps.TravelMode.DRIVING,
     });
 
-    console.log("myResult", results)
+    // Start point
+    new google.maps.Marker({
+      position: startPoint,
+      map,
+      icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png", // Replace with your icon path
+    });
+
+    // Realtime point
+    new google.maps.Marker({
+      position: currentLocation[0],
+      map,
+      icon: "https://maps.google.com/mapfiles/ms/icons/red-dot.png", // Replace with your icon path
+    });
+
+    // Bus stops
+    busStops.forEach(busStop => {
+      new google.maps.Marker({
+        position: busStop,
+        map,
+        icon: "https://maps.google.com/mapfiles/ms/icons/purple-dot.png", // Replace with your icon path
+      });
+    });
+
+    // End point
+    new google.maps.Marker({
+      position: endPoint,
+      map,
+      icon: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png", // Replace with your icon path
+    });
+
+    console.log("myResult", results);
 
     setNormalDirectionsResponse(normalResults);
     setDirectionsResponse(results);
@@ -152,7 +176,7 @@ function App() {
         {/* Google Map Box */}
         <GoogleMap
           center={center}
-          zoom={16}
+          zoom={13}
           mapContainerStyle={{ width: "100%", height: "100%" }}
           options={{
             zoomControl: false,
@@ -163,19 +187,15 @@ function App() {
           onLoad={(map) => setMap(map)}
         >
           {directionsResponse && (
-            <DirectionsRenderer directions={directionsResponse} />
+            <DirectionsRenderer
+              directions={directionsResponse}
+              options={{ suppressMarkers: true }}
+            />
           )}
           {normalDirectionsResponse && ( // Draw path from start to end
-            <DirectionsRenderer directions={normalDirectionsResponse} />
-          )}
-
-          {/* Add a Marker for the start point */}
-          {normalDirectionsResponse && (
-            <Marker
-              position={currentLocation[0]}
-              icon={{
-                url: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
-              }}
+            <DirectionsRenderer
+              directions={normalDirectionsResponse}
+              options={{ suppressMarkers: true }}
             />
           )}
         </GoogleMap>
@@ -245,7 +265,7 @@ function App() {
             isRound
             onClick={() => {
               map.panTo(currentLocation[0]);
-              map.setZoom(20);
+              map.setZoom(14);
             }}
           />
         </HStack>
