@@ -29,7 +29,7 @@ const center = { lat: 15.84021, lng: 108.39215 };
 
 function App() {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyDSbDPP4tB6eUrumQSMQN4gjGh75aiANSk", // Config to env
+    googleMapsApiKey: "AIzaSyBLOMsGChJxggEWtnbpMxxuYc4p8d7FxtY", // Config to env
     libraries: ["places"],
   });
 
@@ -49,7 +49,7 @@ function App() {
   // const [realtime, setRealtime] = useState(null);
   const [histories, setHistories] = useState([]);
 
-  const startPoint = {lat: 15.8321,lng: 108.40635,}; // Hoiana
+  const startPoint = { lat: 15.8321, lng: 108.40635 }; // Hoiana
 
   // Prepare bus stops - Fake datas
   const busStops = [
@@ -60,10 +60,6 @@ function App() {
     {
       location:
         "Trường Đại học Kiến trúc Đà Nẵng, Núi Thành, Hòa Cường, Hòa Cường Nam, Hải Châu District, Da Nang, Vietnam",
-    },
-    {
-      location:
-        "Bệnh Viện Quân Y C17, Nguyễn Hữu Thọ, Hòa Thuận Tây, Hải Châu District, Da Nang, Vietnam",
     },
   ];
 
@@ -107,19 +103,6 @@ function App() {
       return;
     }
 
-    // Selected multiple bus stops
-    // const waypts = [];
-    // const checkboxArray = waypointsRef.current;
-
-    // for (let i = 0; i < checkboxArray.length; i++) {
-    //   if (checkboxArray.options[i].selected) {
-    //     waypts.push({
-    //       location: checkboxArray[i].value,
-    //       stopover: true,
-    //     });
-    //   }
-    // }
-
     // eslint-disable-next-line no-undef
     const directionsService = new google.maps.DirectionsService();
     const normalResults = await directionsService.route({
@@ -140,14 +123,17 @@ function App() {
       travelMode: google.maps.TravelMode.DRIVING,
     });
 
+    console.log("myResult", results)
+
     setNormalDirectionsResponse(normalResults);
     setDirectionsResponse(results);
-    setDistance(results.routes[0].legs[0].distance.text);
-    setDuration(results.routes[0].legs[0].duration?.text);
+    setDistance(normalResults.routes[0].legs[0].distance.text);
+    setDuration(normalResults.routes[0].legs[0].duration?.text);
   };
 
   const handleClearRoute = () => {
     setDirectionsResponse(null);
+    setNormalDirectionsResponse(null);
     setDistance("");
     setDuration("");
     originRef.current.value = "";
@@ -176,36 +162,22 @@ function App() {
           }}
           onLoad={(map) => setMap(map)}
         >
-           {directionsResponse && (
+          {directionsResponse && (
             <DirectionsRenderer directions={directionsResponse} />
           )}
           {normalDirectionsResponse && ( // Draw path from start to end
             <DirectionsRenderer directions={normalDirectionsResponse} />
           )}
-         
 
           {/* Add a Marker for the start point */}
           {normalDirectionsResponse && (
             <Marker
-              position={
-                startPoint
-              }
+              position={currentLocation[0]}
               icon={{
-                url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                url: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
               }}
             />
-           )}
-
-          {/* Add a Marker for the end point */}
-           {directionsResponse && ( 
-            <Marker
-              position={endPoint}
-              icon={{
-                url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-              }}
-            />
-           )} 
-
+          )}
         </GoogleMap>
       </Box>
       <Box
@@ -249,7 +221,6 @@ function App() {
               </Stack>
             </Autocomplete>
           </Box>
-
           <ButtonGroup>
             <Button
               colorScheme="blue"
