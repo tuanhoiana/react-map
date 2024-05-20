@@ -191,8 +191,9 @@ function App() {
         m={4}
         bgColor="white"
         shadow="base"
-        minW="container.sm"
+        // minW="container.sm"
         zIndex="1"
+        w={"45%"}
       >
         {/* I think we can load route from API */}
         <Select placeholder="Choose route" mb={15}>
@@ -202,13 +203,13 @@ function App() {
         </Select>
         <HStack spacing={2} justifyContent="space-between">
           <Box>
-            <p>List of bus stops:</p>
+            <b>List of bus stops:</b>
             {busStops.map((busStop, index) => (
-              <li key={index} value={busStop.location}>
-                {realtimeToWaypoints?.routes[0].legs[index].end_address}:{" "}
-                {realtimeToWaypoints?.routes[0].legs[index].distance.text} - 
-                {realtimeToWaypoints?.routes[0].legs[index].duration.text}
-              </li>
+              <p key={index} value={busStop.location}>
+                {realtimeToWaypoints?.routes[0].legs[index].end_address}
+                {realtimeToWaypoints &&
+                  `: ${realtimeToWaypoints.routes[0].legs[index].distance.text} - ${realtimeToWaypoints.routes[0].legs[index].duration.text}`}
+              </p>
             ))}
           </Box>
           <ButtonGroup>
