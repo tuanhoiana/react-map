@@ -9,3 +9,5 @@ export async function getRealtime() {
     const data = await response.json();
     return data;
 }
+
+

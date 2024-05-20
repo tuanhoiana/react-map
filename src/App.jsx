@@ -5,20 +5,14 @@ import {
   Flex,
   HStack,
   IconButton,
-  Input,
   Select,
   SkeletonText,
-  Stack,
-  Text,
-  layout,
 } from "@chakra-ui/react";
 import { FaLocationArrow, FaTimes } from "react-icons/fa";
 
 import {
   useJsApiLoader,
   GoogleMap,
-  Marker,
-  Autocomplete,
   DirectionsRenderer,
 } from "@react-google-maps/api";
 import { useEffect, useRef, useState } from "react";
@@ -29,26 +23,15 @@ const center = { lat: 15.84021, lng: 108.39215 };
 
 function App() {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyDfsQIIV_h8ddv-RITKVwmavBb8Yj_W_0Y", // Config to env
+    googleMapsApiKey: "AIzaSyBgV9y5hzu6NpDKB9WJd-F153GWecpqLCM", // Config to env
     libraries: ["places"],
   });
 
   const [map, setMap] = useState(/** @type google.maps.Map */ (null));
-  const [normalDirectionsResponse, setNormalDirectionsResponse] =
-    useState(null);
-  const [directionsResponse, setDirectionsResponse] = useState(null);
-
-  const [distance, setDistance] = useState("");
-  const [duration, setDuration] = useState("");
-
-  /** @type React.MutableRefObject<HTMLInputElement> */
-  const originRef = useRef();
-  /** @type React.MutableRefObject<HTMLInputElement> */
-  const destiantionRef = useRef();
-  /** @type React.MutableRefObject<HTMLInputElement> */
-  const waypointsRef = useRef();
-  // const [realtime, setRealtime] = useState(null);
+  const [startToEndPoint, setStartToEndPoint] = useState(null);
+  const [realtimeToWaypoints, setRealtimeToWaypoints] = useState(null);
   const [histories, setHistories] = useState([]);
+  const [realtime, setRealtime] = useState([]);
 
   const startPoint = { lat: 15.8321, lng: 108.40635 }; // Hoiana
 
@@ -87,19 +70,24 @@ function App() {
     fetchHistories();
   }, []);
 
+  useEffect(() => {
+    const fetchRealtime = async () => {
+      const data = await getRealtime();
+      setRealtime(data);
+    };
+
+    fetchRealtime();
+  }, []);
+
   if (!isLoaded) {
     return <SkeletonText />;
   }
 
   // Calculate route
   const handleCalculateAndDisplayRoute = async () => {
-    if (originRef.current === null || destiantionRef.current === null) {
-      return;
-    }
-
     // eslint-disable-next-line no-undef
     const directionsService = new google.maps.DirectionsService();
-    const normalResults = await directionsService.route({
+    const startToEndPoint = await directionsService.route({
       origin: startPoint, // Start point
       waypoints: busStops,
       destination: endPoint, // End point
@@ -108,7 +96,7 @@ function App() {
       travelMode: google.maps.TravelMode.DRIVING,
     });
 
-    const results = await directionsService.route({
+    const realtimeToWaypoints = await directionsService.route({
       origin: currentLocation[0], // Start point - realtime
       waypoints: busStops,
       destination: endPoint, // End point
@@ -132,7 +120,7 @@ function App() {
     });
 
     // Bus stops
-    busStops.forEach(busStop => {
+    busStops.forEach((busStop) => {
       new google.maps.Marker({
         position: busStop,
         map,
@@ -147,28 +135,20 @@ function App() {
       icon: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png", // Replace with your icon path
     });
 
-    console.log("myResult", results);
-
-    setNormalDirectionsResponse(normalResults);
-    setDirectionsResponse(results);
-    setDistance(normalResults.routes[0].legs[0].distance.text);
-    setDuration(normalResults.routes[0].legs[0].duration?.text);
+    setStartToEndPoint(startToEndPoint);
+    setRealtimeToWaypoints(realtimeToWaypoints);
   };
 
   const handleClearRoute = () => {
-    setDirectionsResponse(null);
-    setNormalDirectionsResponse(null);
-    setDistance("");
-    setDuration("");
-    originRef.current.value = "";
-    destiantionRef.current.value = "";
+    setRealtimeToWaypoints(null);
+    setStartToEndPoint(null);
   };
 
   return (
     <Flex
       position="relative"
       flexDirection="column"
-      alignItems="center"
+      alignItems="start"
       h="100vh"
       w="100vw"
     >
@@ -186,60 +166,45 @@ function App() {
           }}
           onLoad={(map) => setMap(map)}
         >
-          {directionsResponse && (
+          {realtimeToWaypoints && (
             <DirectionsRenderer
-              directions={directionsResponse}
+              directions={realtimeToWaypoints}
               options={{ suppressMarkers: true }}
             />
           )}
-          {normalDirectionsResponse && ( // Draw path from start to end
+          {startToEndPoint && ( // Draw path from start to end
             <DirectionsRenderer
-              directions={normalDirectionsResponse}
+              directions={startToEndPoint}
               options={{ suppressMarkers: true }}
             />
           )}
         </GoogleMap>
       </Box>
       <Box
+        justifyContent={"flex-start"}
         p={4}
         borderRadius="lg"
         m={4}
         bgColor="white"
         shadow="base"
-        minW="container.md"
+        minW="container.sm"
         zIndex="1"
       >
         <Select placeholder="Choose route" mb={15}>
-          <option value="hoianaToDaNang">Hoiana - Da Nang</option>
+          <option value="hoianaToDaNang">Hoiana - San Bay Da Nang</option>
           <option value="hoianaToTamKy">Hoiana - Tam Ky</option>
           <option value="hoianaToHoiAn">Hoiana - Hoi An</option>
         </Select>
         <HStack spacing={2} justifyContent="space-between">
-          <Box flexGrow={1}>
-            <Autocomplete>
-              <Input
-                type="text"
-                placeholder="Origin - Realtime"
-                ref={originRef}
-              />
-            </Autocomplete>
-          </Box>
-          <Box flexGrow={1}>
-            <Autocomplete>
-              <Stack>
-                <Select
-                  size="lg"
-                  ref={waypointsRef}
-                  placeholder="Select bus stop"
-                >
-                  {busStops.map((busStop, index) => (
-                    <option key={index} value={busStop.location}>
-                      {busStop.location}
-                    </option>
-                  ))}
-                </Select>
-              </Stack>
-            </Autocomplete>
+          <Box>
+            <p>List of bus stops:</p>
+            {busStops.map((busStop, index) => (
+              <li key={index} value={busStop.location}>
+                {realtimeToWaypoints?.routes[0].legs[index].end_address}:{" "}
+                {realtimeToWaypoints?.routes[0].legs[index].distance.text} - 
+                {realtimeToWaypoints?.routes[0].legs[index].duration.text}
+              </li>
+            ))}
           </Box>
           <ButtonGroup>
             <Button
@@ -257,8 +222,6 @@ function App() {
           </ButtonGroup>
         </HStack>
         <HStack spacing={4} mt={4} justifyContent="space-between">
-          <Text>Distance: {distance} </Text>
-          <Text>Duration: {duration} </Text>
           <IconButton
             aria-label="center back"
             icon={<FaLocationArrow />}
