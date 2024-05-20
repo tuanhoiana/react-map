@@ -82,7 +82,7 @@ function App() {
   if (!isLoaded) {
     return <SkeletonText />;
   }
-
+  let markers = [];
   // Calculate route
   const handleCalculateAndDisplayRoute = async () => {
     // eslint-disable-next-line no-undef
@@ -142,6 +142,10 @@ function App() {
   const handleClearRoute = () => {
     setRealtimeToWaypoints(null);
     setStartToEndPoint(null);
+
+    // Clear markers
+    markers.forEach((marker) => marker.setMap(null));
+    markers = [];
   };
 
   return (
@@ -190,6 +194,7 @@ function App() {
         minW="container.sm"
         zIndex="1"
       >
+        {/* I think we can load route from API */}
         <Select placeholder="Choose route" mb={15}>
           <option value="hoianaToDaNang">Hoiana - San Bay Da Nang</option>
           <option value="hoianaToTamKy">Hoiana - Tam Ky</option>
